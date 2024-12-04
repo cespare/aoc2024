@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"iter"
 	"log"
 	"net/http"
 	"os"
@@ -371,6 +372,17 @@ var nesw = []vec2{
 	{1, 0},
 }
 
+var box8 = []vec2{
+	{-1, -1},
+	{0, -1},
+	{1, -1},
+	{-1, 0},
+	{1, 0},
+	{-1, 1},
+	{0, 1},
+	{1, 1},
+}
+
 func (v vec2) neighbors4() []vec2 {
 	neighbors := make([]vec2, 4)
 	for i, d := range nesw {
@@ -380,15 +392,9 @@ func (v vec2) neighbors4() []vec2 {
 }
 
 func (v vec2) neighbors8() []vec2 {
-	neighbors := make([]vec2, 0, 8)
-	for dx := int64(-1); dx <= 1; dx++ {
-		for dy := int64(-1); dy <= 1; dy++ {
-			if dx == 0 && dy == 0 {
-				continue
-			}
-			n := vec2{x: v.x + dx, y: v.y + dy}
-			neighbors = append(neighbors, n)
-		}
+	neighbors := make([]vec2, 8)
+	for i, d := range box8 {
+		neighbors[i] = v.add(d)
 	}
 	return neighbors
 }
@@ -570,12 +576,27 @@ func (g *grid[E]) set(v vec2, e E) {
 	g.g[v.y][v.x] = e
 }
 
-func (g *grid[E]) forEach(f func(v vec2, e E) bool) {
-	for y := int64(0); y < g.rows; y++ {
-		for x := int64(0); x < g.cols; x++ {
-			v := vec2{x, y}
-			if !f(v, g.at(v)) {
-				return
+func (g *grid[E]) all() iter.Seq2[vec2, E] {
+	return func(yield func(vec2, E) bool) {
+		for y := int64(0); y < g.rows; y++ {
+			for x := int64(0); x < g.cols; x++ {
+				v := vec2{x, y}
+				if !yield(v, g.at(v)) {
+					return
+				}
+			}
+		}
+	}
+}
+
+func (g *grid[E]) vecs() iter.Seq[vec2] {
+	return func(yield func(vec2) bool) {
+		for y := int64(0); y < g.rows; y++ {
+			for x := int64(0); x < g.cols; x++ {
+				v := vec2{x, y}
+				if !yield(v) {
+					return
+				}
 			}
 		}
 	}
