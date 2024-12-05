@@ -1,3 +1,5 @@
+github.com/cespare/next v0.0.2 h1:qVacvGvsAKKuddN3vfJetYRsKVe12QFTdmy8xQ5AYV0=
+github.com/cespare/next v0.0.2/go.mod h1:xstSgv77lw1VOxHdJPohAxcWw4XEusQArv34Smlix5M=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
 github.com/kr/pretty v0.3.1/go.mod h1:hoEshYVHaxMs3cyo3Yncou5ZscifuDolrwPKZanG3xk=
