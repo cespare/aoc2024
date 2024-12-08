@@ -365,6 +365,10 @@ func (v vec2) mag() int64 {
 	return abs(v.x) + abs(v.y)
 }
 
+func (v vec2) inv() vec2 {
+	return vec2{-v.x, -v.y}
+}
+
 var nesw = []vec2{
 	{0, 1},
 	{-1, 0},
