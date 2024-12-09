@@ -217,7 +217,6 @@ func (ctx *problemContext) printTimings() {
 	}
 	if !ctx.timings.part2.IsZero() {
 		ctx.l.Println("  Part 2:", ctx.timings.part2.Sub(t))
-		t = ctx.timings.part2
 	}
 }
 
