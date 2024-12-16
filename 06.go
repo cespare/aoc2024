@@ -68,7 +68,7 @@ func (p *patrol) advance() (done bool) {
 		p.pos = next
 		return false
 	case '#':
-		p.d = p.d.matMul(rotations[3])
+		p.d = p.d.matMul(turnCW)
 		return false
 	default:
 		panic("bad")
@@ -97,7 +97,7 @@ func (p *patrol) countObstacles() int {
 			}
 			p.pos = next
 		case '#':
-			p.d = p.d.matMul(rotations[3])
+			p.d = p.d.matMul(turnCW)
 		default:
 			panic("bad")
 		}

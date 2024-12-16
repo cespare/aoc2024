@@ -368,12 +368,14 @@ func (v vec2) inv() vec2 {
 	return vec2{-v.x, -v.y}
 }
 
-var nesw = []vec2{
-	{0, 1},
-	{-1, 0},
-	{0, -1},
-	{1, 0},
-}
+var (
+	north = vec2{0, -1}
+	east  = vec2{1, 0}
+	south = vec2{0, 1}
+	west  = vec2{-1, 0}
+)
+
+var nesw = []vec2{north, east, south, west}
 
 var box8 = []vec2{
 	{-1, -1},
@@ -414,24 +416,20 @@ func (v vec2) matMul(m mat2) vec2 {
 	}
 }
 
-var rotations = [4]mat2{
-	{ // 0
-		1, 0,
-		0, 1,
-	},
-	{ // 90
-		0, 1,
-		-1, 0,
-	},
-	{ // 180
-		-1, 0,
-		0, -1,
-	},
-	{ // 270
+var (
+	turnCW = mat2{
 		0, -1,
 		1, 0,
-	},
-}
+	}
+	turnCCW = mat2{
+		0, 1,
+		-1, 0,
+	}
+	turn180 = mat2{
+		-1, 0,
+		0, -1,
+	}
+)
 
 func parseInt(s string) int64 {
 	n, err := strconv.ParseInt(s, 10, 64)
@@ -447,6 +445,12 @@ func parseUint(s string) uint64 {
 		panic(err)
 	}
 	return n
+}
+
+func sscanf(s, format string, args ...any) {
+	if _, err := fmt.Sscanf(s, format, args...); err != nil {
+		panic(fmt.Sprintf("sscanf error: %s", err))
+	}
 }
 
 type vec3 struct {
@@ -557,6 +561,22 @@ type grid[E any] struct {
 	cols int64
 }
 
+func (g *grid[E]) init(rows, cols int64, v E) {
+	if len(g.g) > 0 {
+		panic("double init")
+	}
+	g.g = make([][]E, rows)
+	for i := range g.g {
+		row := make([]E, cols)
+		for j := range g.g[i] {
+			row[j] = v
+		}
+		g.g[i] = row
+	}
+	g.rows = rows
+	g.cols = cols
+}
+
 func (g *grid[E]) addRow(row []E) {
 	if g.g == nil {
 		g.cols = int64(len(row))
@@ -631,6 +651,15 @@ func (g *grid[E]) clone() *grid[E] {
 		g1.g[i] = slices.Clone(row)
 	}
 	return g1
+}
+
+func byteGridString(g *grid[byte]) string {
+	var b strings.Builder
+	for _, row := range g.g {
+		b.Write(row)
+		fmt.Fprintln(&b)
+	}
+	return b.String()
 }
 
 // Extra slice stuff not in slices.
