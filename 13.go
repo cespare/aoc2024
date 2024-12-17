@@ -33,7 +33,8 @@ func problem13(ctx *problemContext) {
 
 	var part1 int64
 	for _, m := range machines {
-		if n, ok := m.minCost(); ok {
+		n, ok := m.minCost()
+		if ok {
 			part1 += n
 		}
 	}
@@ -57,41 +58,39 @@ type clawMachine struct {
 }
 
 func (m clawMachine) minCost() (int64, bool) {
-	return 1, true
-}
+	// System of equations:
+	// A * a.x + B * b.x = prize.x
+	// A * a.y + B * b.y = prize.y
+	//
+	// Rename:
+	//
+	// A*Xa + B*Xb = Xp
+	// A*Ya + B*Yb = Yp
+	//
+	// => A = (Xp - B*Xb) / Xa
+	//
+	// => ((Xp - B*Xb)/Xa) * Ya + B*Yb = Yp
+	//    (Ya*Xp - Ya*B*Xb)/Xa + Xa*B*Yb/Xa = Yp
+	//    Ya*Xp - Ya*B*Xb + Xa*B*Yb = Yp*Xa
+	//    Xa*B*Yb - Ya*B*Xb = Yp*Xa - Ya*Xp
+	//    B(Xa*Yb - Ya*Xb) = Yp*Xa - Ya*Xp
+	//    B = (Yp*Xa - Xp*Ya) / (Xa*Yb - Ya*Xb)
+	//
+	// => A = (Yp*Xb - Xp*Yb) / (Xb*Ya - Yb*Xa) (by symmetry)
 
-// func (m clawMachine) minCost() (int64, bool) {
-// 	cache := make(map[vec2]int64) // -1 for no solution
-// 	var solve func(v vec2) int64
-// 	solve = func(v vec2) (cost int64) {
-// 		if c, ok := cache[v]; ok {
-// 			return c
-// 		}
-// 		defer func() { cache[v] = cost }()
-// 		if v.x == m.prize.x && v.y == m.prize.y {
-// 			return 0
-// 		}
-// 		cost = -1
-// 		if va := v.add(m.a); va.x <= m.prize.x && va.y <= m.prize.y {
-// 			if ca := solve(va); ca >= 0 {
-// 				cost = ca + 3
-// 			}
-// 		}
-// 		if vb := v.add(m.b); vb.x <= m.prize.x && vb.y <= m.prize.y {
-// 			if cb := solve(vb); cb >= 0 {
-// 				cb++
-// 				if cost >= 0 {
-// 					cost = min(cost, cb)
-// 				} else {
-// 					cost = cb
-// 				}
-// 			}
-// 		}
-// 		return cost
-// 	}
-// 	cost := solve(vec2{0, 0})
-// 	if cost < 0 {
-// 		return 0, false
-// 	}
-// 	return cost, true
-// }
+	numA := m.prize.y*m.b.x - m.prize.x*m.b.y
+	denomA := m.b.x*m.a.y - m.b.y*m.a.x
+	if denomA == 0 || numA%denomA != 0 {
+		return 0, false
+	}
+	a := numA / denomA
+
+	numB := m.prize.y*m.a.x - m.prize.x*m.a.y
+	denomB := m.a.x*m.b.y - m.a.y*m.b.x
+	if denomB == 0 || numB%denomB != 0 {
+		return 0, false
+	}
+	b := numB / denomB
+
+	return a*3 + b, true
+}
