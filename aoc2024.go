@@ -344,6 +344,10 @@ type vec2 struct {
 	y int64
 }
 
+func (v vec2) String() string {
+	return fmt.Sprintf("%d,%d", v.x, v.y)
+}
+
 func (v vec2) add(v1 vec2) vec2 {
 	return vec2{v.x + v1.x, v.y + v1.y}
 }
@@ -568,7 +572,7 @@ func (g *grid[E]) init(rows, cols int64, v E) {
 	g.g = make([][]E, rows)
 	for i := range g.g {
 		row := make([]E, cols)
-		for j := range g.g[i] {
+		for j := range row {
 			row[j] = v
 		}
 		g.g[i] = row
