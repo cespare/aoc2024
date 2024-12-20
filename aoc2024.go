@@ -629,6 +629,27 @@ func (g *grid[E]) vecs() iter.Seq[vec2] {
 	}
 }
 
+// ball gives all the grid positions that are part of the open ball with the
+// given center and radius. The iterator gives the elements and their distance
+// from the center.
+func (g *grid[E]) ball(center vec2, radius int64) iter.Seq2[vec2, int64] {
+	return func(yield func(vec2, int64) bool) {
+		for d := int64(0); d < radius; d++ {
+			v := center.add(vec2{0, -d})
+			for _, dv := range []vec2{{-1, 1}, {1, 1}, {1, -1}, {-1, -1}} {
+				for range d {
+					if g.contains(v) {
+						if !yield(v, d) {
+							return
+						}
+					}
+					v = v.add(dv)
+				}
+			}
+		}
+	}
+}
+
 func (g *grid[E]) insertCol(x int64, e E) {
 	g.cols++
 	for y := int64(0); y < g.rows; y++ {
